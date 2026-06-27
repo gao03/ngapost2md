@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --ivory: #faf9f5;
+    --paper: #fffdfa;
+    --slate: #171716;
+    --text: #3d3d3a;
+    --muted: #7b7a73;
+    --line: #d8d3c8;
+    --soft: #f0eee6;
+    --accent: #b76546;
+    --green: #63784f;
+    --blue: #4f6f91;
+    --red: #a44f43;
+    --border: 1.5px solid var(--line);
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    padding: 44px 24px 88px;
+    background: var(--ivory);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.72;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 44px;
+  }
+
+  nav {
+    position: sticky;
+    top: 28px;
+    align-self: start;
+    font-size: 13px;
+  }
+
+  nav .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  nav a {
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    border-left: 2px solid var(--line);
+    padding: 6px 0 6px 12px;
+  }
+
+  nav a:hover { color: var(--slate); border-color: var(--accent); }
+
+  main { max-width: 860px; }
+
+  header { margin-bottom: 26px; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    margin: 0 0 12px;
+    color: var(--slate);
+    font-family: var(--serif);
+    font-weight: 520;
+    font-size: 34px;
+    line-height: 1.22;
+  }
+
+  h2 {
+    margin: 42px 0 14px;
+    color: var(--slate);
+    font-family: var(--serif);
+    font-weight: 520;
+    font-size: 24px;
+    line-height: 1.26;
+    scroll-margin-top: 24px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    color: var(--slate);
+    font-size: 16px;
+    line-height: 1.36;
+  }
+
+  p { margin: 0 0 12px; }
+
+  .meta {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .meta a {
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--muted);
+  }
+
+  .meta a:hover { color: var(--slate); border-bottom-color: var(--accent); }
+
+  .tldr {
+    background: #fff;
+    border: var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 18px 0 22px;
+  }
+
+  .tldr .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .tldr p {
+    color: var(--slate);
+    font-size: 18px;
+    line-height: 1.62;
+    margin: 0;
+  }
+
+  .summary-band {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--paper);
+    border: var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .card p { margin: 0; font-size: 15px; line-height: 1.6; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 2px 9px;
+    margin: 0 6px 8px 0;
+    background: var(--soft);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.45;
+    white-space: nowrap;
+  }
+
+  .tag.major { color: #40542f; background: #e8eedf; }
+  .tag.some { color: #315575; background: #e4edf4; }
+  .tag.few { color: #77402f; background: #f2e3dc; }
+  .tag.note { color: #5b5474; background: #ebe8f1; }
+
+  .opinion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .dispute-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .dispute {
+    background: var(--paper);
+    border: var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .sides {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .side {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    line-height: 1.58;
+  }
+
+  .side b { color: var(--slate); }
+
+  .heat-list,
+  .evidence-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .heat-item {
+    display: grid;
+    grid-template-columns: minmax(120px, 180px) 1fr;
+    gap: 14px;
+    align-items: center;
+    background: var(--paper);
+    border: var(--border);
+    border-radius: 8px;
+    padding: 13px 14px;
+  }
+
+  .heat-name {
+    color: var(--slate);
+    font-weight: 650;
+    line-height: 1.4;
+  }
+
+  .heat-level {
+    display: inline-flex;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 2px 8px;
+  }
+
+  .heat-meter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    min-height: 12px;
+  }
+
+  .heat-meter span {
+    border-radius: 999px;
+    background: var(--soft);
+    border: 1px solid var(--line);
+  }
+
+  .hot-1 .heat-meter span:nth-child(-n+1),
+  .hot-2 .heat-meter span:nth-child(-n+2),
+  .hot-3 .heat-meter span:nth-child(-n+3),
+  .hot-4 .heat-meter span:nth-child(-n+4) {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .heat-desc {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .evidence {
+    background: var(--paper);
+    border: var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 15px;
+    line-height: 1.62;
+  }
+
+  .evidence h3 { margin-bottom: 6px; }
+
+  .evidence p { margin: 0; }
+
+  .source {
+    margin-top: 42px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+    word-break: break-all;
+  }
+
+  @media (max-width: 900px) {
+    body { padding: 28px 14px 60px; }
+    .page { grid-template-columns: 1fr; gap: 0; }
+    nav { display: none; }
+    main { max-width: none; }
+    h1 { font-size: 28px; }
+    .summary-band,
+    .opinion-grid,
+    .sides,
+    .heat-item { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav aria-label="报告目录">
+    <div class="label">目录</div>
+    <a href="#summary">短结论</a>
+    <a href="#map">观点地图</a>
+    <a href="#disputes">核心争议</a>
+    <a href="#heat">讨论热度</a>
+    <a href="#evidence">依据</a>
+    <a href="#take">我的判断</a>
+  </nav>
+
+  <main>
+    <header>
+      <div class="eyebrow">论坛观点报告</div>
+      <h1>{{TITLE}}</h1>
+      <p class="meta"><a href="{{THREAD_URL}}">tid {{TID}}</a> · {{FLOOR_RANGE}} · 分析时间 {{ANALYZED_AT}}</p>
+    </header>
+
+    <section id="summary">
+      <div class="tldr">
+        <div class="label">TL;DR</div>
+        <p>{{TLDR}}</p>
+      </div>
+      <div class="summary-band">
+        {{SUMMARY_CARDS}}
+      </div>
+    </section>
+
+    <section id="map">
+      <h2>观点地图</h2>
+      <div class="opinion-grid">
+        {{OPINION_MAP}}
+      </div>
+    </section>
+
+    <section id="disputes">
+      <h2>3 个核心争议</h2>
+      <div class="dispute-list">
+        {{DISPUTES}}
+      </div>
+    </section>
+
+    <section id="heat">
+      <h2>讨论热度</h2>
+      <div class="heat-list">
+        {{HEAT_ITEMS}}
+      </div>
+    </section>
+
+    <section id="evidence">
+      <h2>简短依据</h2>
+      <div class="evidence-list">
+        {{EVIDENCE}}
+      </div>
+    </section>
+
+    <section id="take">
+      <h2>我的判断</h2>
+      <div class="card">
+        <p>{{AGENT_TAKE}}</p>
+      </div>
+    </section>
+
+    <p class="source">Markdown 文件：{{SOURCE_PATH}}</p>
+  </main>
+</div>
+</body>
+</html>
