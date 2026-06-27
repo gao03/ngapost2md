@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"os"
 
 	"gopkg.in/ini.v1"
 )
@@ -18,9 +19,10 @@ var defaultConfig = map[string][][3]string{
 	},
 	"network": {
 		{"base_url", "https://bbs.nga.cn", "软件访问的 NGA 域名。默认值为 https://bbs.nga.cn。"},
-		{"ua", "<;MODIFY_ME;>", "浏览器 User-Agent，填写你常用浏览器的 UA 即可。修改时请将尖括号及内部所有文本替换或删除，并确保值被反引号包裹。"},
-		{"ngaPassportUid", "<;MODIFY_ME;>", "NGA 网站个人 Cookie 项目。修改时请将尖括号及内部所有文本替换或删除，并确保值被反引号包裹。"},
-		{"ngaPassportCid", "<;MODIFY_ME;>", "NGA 网站个人 Cookie 项目。修改时请将尖括号及内部所有文本替换或删除，并确保值被反引号包裹。"},
+		{"ua", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", "浏览器 User-Agent，默认使用通用 Chrome UA。"},
+		{"cookie_from_chrome", "True", "当 ngaPassportUid 或 ngaPassportCid 未配置时，是否尝试从本机 Chrome 读取 NGA 登录 Cookie。默认值为 True。"},
+		{"ngaPassportUid", "<;MODIFY_ME;>", "NGA 网站个人 Cookie 项目。留空或保持默认值时可自动从 Chrome 读取。"},
+		{"ngaPassportCid", "<;MODIFY_ME;>", "NGA 网站个人 Cookie 项目。留空或保持默认值时可自动从 Chrome 读取。"},
 		{"thread", "2", "网络并发数，理论上提高并发数可以增加下载速度。仅支持 1、2、3。若开启 enhance_ori_reply，请将此值设定为 1。默认值为 2。"},
 		{"page_download_limit", "100", "[#56]每次下载限制新下载的大约页数。达到上限后需重新运行程序以继续下载，直至全部下载完成。允许范围为 -1（含）至 100（含）。当值为 0 或 -1 时则不限制。默认值为 100（约 100 页）。"},
 	},
@@ -96,6 +98,9 @@ func GetConfigAutoUpdate() (*ini.File, error) {
 	// 打开旧的INI配置文件
 	cfg, err := ini.Load("config.ini")
 	if err != nil {
+		if os.IsNotExist(err) {
+			return genDefaultConfig(), nil
+		}
 		return nil, fmt.Errorf("无法加载配置文件: %v", err)
 	}
 

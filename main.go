@@ -208,29 +208,14 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	// Cookie 配置
-	var ngaPassportUid = cfg.Section("network").Key("ngaPassportUid").String()
-	var ngaPassportCid = cfg.Section("network").Key("ngaPassportCid").String()
-	var cookie strings.Builder
-	cookie.WriteString("ngaPassportUid=")
-	cookie.WriteString(ngaPassportUid)
-	cookie.WriteString(";ngaPassportCid=")
-	cookie.WriteString(ngaPassportCid)
-	nga.COOKIE = cookie.String()
-
-	nga.BASE_URL = cfg.Section("network").Key("base_url").String()
-	nga.UA = cfg.Section("network").Key("ua").String()
-
-	// 核心配置项未更改，拒绝执行
-	if ngaPassportUid == "" || strings.Contains(ngaPassportUid, "MODIFY_ME") {
-		log.Fatalln("配置项配置错误: ngaPassportUid=", ngaPassportUid)
+	networkCfg, err := config.ResolveNetworkConfig(cfg)
+	if err != nil {
+		log.Fatalln(err.Error())
 	}
-	if ngaPassportCid == "" || strings.Contains(ngaPassportCid, "MODIFY_ME") {
-		log.Fatalln("配置项配置错误: ngaPassportCid=", ngaPassportCid)
-	}
-	if nga.UA == "" || strings.Contains(nga.UA, "MODIFY_ME") {
-		log.Fatalln("配置项配置错误: ua=", nga.UA)
-	}
+	nga.BASE_URL = networkCfg.BaseURL
+	nga.UA = networkCfg.UserAgent
+	nga.COOKIE = networkCfg.Cookie
+	log.Println("NGA Cookie 来源:", networkCfg.CookieSource)
 
 	// 默认线程数为2,仅支持1~3
 	nga.ApplyConfig(cfg)

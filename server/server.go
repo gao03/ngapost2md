@@ -58,30 +58,14 @@ func Start(opts ServeOpts) error {
 		port = cfg.Section("server").Key("port").MustInt(8080)
 	}
 
-	// 设置 nga 全局变量（与 CLI main.go 相同逻辑）
-	var ngaPassportUid = cfg.Section("network").Key("ngaPassportUid").String()
-	var ngaPassportCid = cfg.Section("network").Key("ngaPassportCid").String()
-	var cookie strings.Builder
-	cookie.WriteString("ngaPassportUid=")
-	cookie.WriteString(ngaPassportUid)
-	cookie.WriteString(";")
-	cookie.WriteString("ngaPassportCid=")
-	cookie.WriteString(ngaPassportCid)
-	nga.COOKIE = cookie.String()
-
-	nga.BASE_URL = cfg.Section("network").Key("base_url").String()
-	nga.UA = cfg.Section("network").Key("ua").String()
-
-	// 核心配置项校验
-	if ngaPassportUid == "" || strings.Contains(ngaPassportUid, "MODIFY_ME") {
-		return fmt.Errorf("配置项配置错误: ngaPassportUid=%s", ngaPassportUid)
+	networkCfg, err := config.ResolveNetworkConfig(cfg)
+	if err != nil {
+		return err
 	}
-	if ngaPassportCid == "" || strings.Contains(ngaPassportCid, "MODIFY_ME") {
-		return fmt.Errorf("配置项配置错误: ngaPassportCid=%s", ngaPassportCid)
-	}
-	if nga.UA == "" || strings.Contains(nga.UA, "MODIFY_ME") {
-		return fmt.Errorf("配置项配置错误: ua=%s", nga.UA)
-	}
+	nga.BASE_URL = networkCfg.BaseURL
+	nga.UA = networkCfg.UserAgent
+	nga.COOKIE = networkCfg.Cookie
+	log.Println("NGA Cookie 来源:", networkCfg.CookieSource)
 
 	nga.ApplyConfig(cfg)
 
@@ -195,6 +179,13 @@ func ReloadConfig() error {
 		return err
 	}
 
+	networkCfg, err := config.ResolveNetworkConfig(cfg)
+	if err != nil {
+		return err
+	}
+	nga.BASE_URL = networkCfg.BaseURL
+	nga.UA = networkCfg.UserAgent
+	nga.COOKIE = networkCfg.Cookie
 	nga.ApplyConfig(cfg)
 
 	// 重新创建 HTTP client（UA 可能变了）
